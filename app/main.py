@@ -13,6 +13,7 @@ def main():
                 continue  
             request, headers = data.decode().split("\r\n", 1)
             method, target = request.split(" ")[:2]
+            print("splitting", data.decode().split("\r\n"))
             user_agent = [string for string in data.decode().split("\r\n") if "User-Agent" in string][0].split(":")[1].strip()
             print(user_agent)
             if not data:
