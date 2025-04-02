@@ -6,10 +6,14 @@ def main():
         conn, addr = s.accept()
         while True:
             data = conn.recv(1024)
+            if not data:
+                break 
+            decoded = data.decode()
+            if "\r\n\r\n" not in decoded:
+                continue  
             request, headers = data.decode().split("\r\n", 1)
             method, target = request.split(" ")[:2]
             user_agent = [string for string in data.decode().split("\r\n") if "User-Agent" in string][0].split(":")[1].strip()
-            print(user_agent)
             if not data:
                 break
             if target == "/":
