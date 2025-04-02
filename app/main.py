@@ -10,11 +10,13 @@ def main():
     conn, _ = server_socket.accept() 
     data = conn.recv(4096)
     res = data.decode("utf-8").split("/")[1].split(' ')[0]
+    print(data)
+    print(res)
     if(not res):
-        conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
-    
-    else:
         conn.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
+    else:
+        conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
+        
     
 
 if __name__ == "__main__":
