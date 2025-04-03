@@ -54,9 +54,9 @@ def main():
     if len(sys.argv) > 1:
         folder = Path(sys.argv[2])  
 
-    if not folder.is_dir():
-        print(f"{folder} is not a valid directory.")
-        folder = None
+    # if not folder.is_dir():
+    #     print(f"{folder} is not a valid directory.")
+    #     folder = None
     
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind(("localhost", 4221))
