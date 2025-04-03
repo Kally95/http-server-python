@@ -25,11 +25,11 @@ def handle_client(conn, addr, folder=None):
             elif target == "/user-agent":
                 user_agent = [string for string in data.decode().split("\r\n") if "User-Agent" in string][0].split(":")[1].strip()
                 response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(user_agent)}\r\n\r\n{user_agent}".encode()
-            elif target.startswith("/file/"):
+            elif target.startswith("/files/"):
                 if folder == None:
                     response = b"HTTP/1.1 404 Not Found\r\n\r\n"
                 else:
-                    file_name = target[len("/file/"):]
+                    file_name = target[len("/files/"):]
                     abs_path = folder / file_name
                     file_contents = retrieve_file_contents(abs_path)
                     response = f"HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: {len(file_contents)}\r\n\r\n".encode() + file_contents.encode()
@@ -40,8 +40,9 @@ def handle_client(conn, addr, folder=None):
 def retrieve_file_contents(folder_path):
     if not folder_path.exists():
         print("File doesn't exist")
+        return None
     with folder_path.open() as f:
-        file_contents = f.readline()
+        file_contents = f.read()
     return file_contents
 
 def main():
