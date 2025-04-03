@@ -3,6 +3,8 @@ import threading
 import sys
 from pathlib import Path
 
+NOT_FOUND_RESPONSE = b"HTTP/1.1 404 Not Found\r\n\r\n"
+
 def handle_client(conn, addr, folder=None):
     with conn:  
         while True:
@@ -27,14 +29,17 @@ def handle_client(conn, addr, folder=None):
                 response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(user_agent)}\r\n\r\n{user_agent}".encode()
             elif target.startswith("/files/"):
                 if folder == None:
-                    response = b"HTTP/1.1 404 Not Found\r\n\r\n"
+                    response = NOT_FOUND_RESPONSE
                 else:
                     file_name = target[len("/files/"):]
                     abs_path = folder / file_name
                     file_contents = retrieve_file_contents(abs_path)
-                    response = f"HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: {len(file_contents)}\r\n\r\n".encode() + file_contents.encode()
+                    if file_contents == None:
+                        response = NOT_FOUND_RESPONSE
+                    else:
+                        response = f"HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: {len(file_contents)}\r\n\r\n".encode() + file_contents.encode()
             else:
-                response = b"HTTP/1.1 404 Not Found\r\n\r\n"
+                response = NOT_FOUND_RESPONSE
             conn.sendall(response)
             
 def retrieve_file_contents(folder_path):
