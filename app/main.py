@@ -1,9 +1,8 @@
 import socket
-def main():
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(("localhost", 4221))
-        s.listen()
-        conn, addr = s.accept()
+import threading
+
+def handle_client(conn, addr):
+    with conn:  
         while True:
             data = conn.recv(1024)
             if not data:
@@ -27,5 +26,15 @@ def main():
             else:
                 response = b"HTTP/1.1 404 Not Found\r\n\r\n"
             conn.sendall(response)
+
+def main():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(("localhost", 4221))
+        s.listen()
+        while True:
+            conn, addr = s.accept()
+            print(f"connected by {addr}")
+            t = threading.Thread(target=handle_client, args=(conn, addr))   
+            t.start() 
 if __name__ == "__main__":
     main()
