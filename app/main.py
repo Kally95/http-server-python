@@ -51,9 +51,9 @@ def retrieve_file_contents(folder_path):
     return file_contents
 
 def main():
+    if len(sys.argv) > 1:
+        folder = Path(sys.argv[2])  
 
-    folder = Path(sys.argv[2])
-    print(folder)
     if not folder.is_dir():
         print(f"{folder} is not a valid directory.")
         folder = None
@@ -64,8 +64,10 @@ def main():
         while True:
             conn, addr = s.accept()
             print(f"connected by {addr}")
-            t = threading.Thread(target=handle_client, args=(conn, addr, folder.absolute()))   
-            t.start() 
+            if not folder:
+                threading.Thread(target=handle_client, args=(conn, addr)).start()
+            else:
+                threading.Thread(target=handle_client, args=(conn, addr, folder.absolute())).start()
             
 if __name__ == "__main__":
     main()
