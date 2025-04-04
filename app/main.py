@@ -80,7 +80,7 @@ def handle_client(conn, addr, folder: Path = None):
                     abs_path = folder / file_name
                     with open(abs_path, 'w') as f:
                         f.write(body)
-                    response = HTTP_200.encode()
+                    response = f"{HTTP_200}\r\n".encode()
                 else:
                     response = NOT_FOUND_RESPONSE
 
