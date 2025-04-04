@@ -5,6 +5,7 @@ from pathlib import Path
 
 HTTP_200 = "HTTP/1.1 200 OK\r\n"
 HTTP_404 = "HTTP/1.1 404 Not Found\r\n\r\n"
+HTTP_201_CREATED = "HTTP/1.1 201 Created\r\n\r\n"
 NOT_FOUND_RESPONSE = HTTP_404.encode()
 
 def parse_http_request(request_text: str):
@@ -80,7 +81,7 @@ def handle_client(conn, addr, folder: Path = None):
                     abs_path = folder / file_name
                     with open(abs_path, 'w') as f:
                         f.write(body)
-                    response = f"{HTTP_200}\r\n".encode()
+                    response = f"{HTTP_201_CREATED}".encode()
                 else:
                     response = NOT_FOUND_RESPONSE
 
