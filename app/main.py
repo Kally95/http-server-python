@@ -64,8 +64,8 @@ def handle_client(conn, addr, folder: Path = None):
                             response = (
                                 f"{HTTP_200}"
                                 f"Content-Type: text/plain\r\n"
-                                f"Content-Length: {len(value)}\r\n\r\n"
-                                f"{value}"
+                                f"Content-Length: {str(len(compressed_body))}\r\n\r\n"
+                                f"{compressed_body}"
                             ).encode()
                     else:
                         response = (
