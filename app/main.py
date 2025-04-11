@@ -47,9 +47,9 @@ def handle_client(conn, addr, folder: Path = None):
                 if target == "/":
                     response = f"{HTTP_200}\r\n".encode()
                 elif target.startswith("/echo/"):
-                    encoding = headers.get("Accept-Encoding").lower()
+                    encoding = headers.get("Accept-Encoding")
                     value = target.split("/echo/", 1)[1]
-                    if(encoding in VALID_ENCODINGS):
+                    if(encoding is not None and encoding.lower() in VALID_ENCODINGS):
                         response = (
                             f"{HTTP_200}"
                             f"Content-Type: text/plain\r\n"
