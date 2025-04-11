@@ -61,6 +61,13 @@ def handle_client(conn, addr, folder: Path = None):
                                 f"Content-Encoding: gzip\r\n\r\n"
                                 f"{value}"
                             ).encode()
+                        else:
+                            response = (
+                                f"{HTTP_200}"
+                                f"Content-Type: text/plain\r\n"
+                                f"Content-Length: {len(value)}\r\n\r\n"
+                                f"{value}"
+                            ).encode()
                     else:
                         response = (
                             f"{HTTP_200}"
