@@ -47,12 +47,10 @@ def handle_client(conn, addr, folder: Path = None):
                     response = f"{HTTP_200}\r\n".encode()
                 elif target.startswith("/echo/"):
                     encoding = headers.get("Accept-Encoding")
-                    print("encodings: ", )           
+                    print("encodings: ", encoding.split(', ')) # encodings:  ['encoding-1', 'gzip', 'encoding-2']
                     value = target.split("/echo/", 1)[1]
                     if(encoding is not None):
-                        encoding.split(', ')
-                        encoding_exists = [val for val in encoding if val in VALID_ENCODINGS]
-                        print(encoding_exists)
+                        encoding_exists = [val for val in encoding.split(', ') if val in VALID_ENCODINGS]
                         if(encoding_exists):
                             response = (
                                 f"{HTTP_200}"
