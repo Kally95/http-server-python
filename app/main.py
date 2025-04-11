@@ -39,7 +39,6 @@ def handle_client(conn, addr, folder: Path = None):
 
                 try:
                     method, target, _ = request_line.split(" ")
-                    print(target)
                 except ValueError:
                     conn.sendall(NOT_FOUND_RESPONSE)
                     break
@@ -48,15 +47,18 @@ def handle_client(conn, addr, folder: Path = None):
                     response = f"{HTTP_200}\r\n".encode()
                 elif target.startswith("/echo/"):
                     encoding = headers.get("Accept-Encoding")
+                    print("encodings: ", encoding.split(', '))           
                     value = target.split("/echo/", 1)[1]
-                    if(encoding is not None and encoding.lower() in VALID_ENCODINGS):
-                        response = (
-                            f"{HTTP_200}"
-                            f"Content-Type: text/plain\r\n"
-                            f"Content-Length: {len(value)}\r\n"
-                            f"Content-Encoding: gzip\r\n\r\n"
-                            f"{value}"
-                        ).encode()
+                    if(encoding is not None):
+                        encoding_exists = [val for val in encoding if val in VALID_ENCODINGS]
+                        if(encoding_exists):
+                            response = (
+                                f"{HTTP_200}"
+                                f"Content-Type: text/plain\r\n"
+                                f"Content-Length: {len(value)}\r\n"
+                                f"Content-Encoding: gzip\r\n\r\n"
+                                f"{value}"
+                            ).encode()
                     else:
                         response = (
                             f"{HTTP_200}"
