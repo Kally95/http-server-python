@@ -7,6 +7,7 @@ HTTP_200 = "HTTP/1.1 200 OK\r\n"
 HTTP_404 = "HTTP/1.1 404 Not Found\r\n\r\n"
 HTTP_201_CREATED = "HTTP/1.1 201 Created\r\n\r\n"
 NOT_FOUND_RESPONSE = HTTP_404.encode()
+VALID_ENCODINGS = ["gzip"]
 
 def parse_http_request(request_text: str):
     lines = request_text.split("\r\n")
@@ -33,6 +34,7 @@ def handle_client(conn, addr, folder: Path = None):
                     continue
 
                 header_text, body = decoded_data.split("\r\n\r\n", 1)
+                print(header_text)
                 request_line, headers = parse_http_request(header_text)
 
                 try:
@@ -45,13 +47,21 @@ def handle_client(conn, addr, folder: Path = None):
                 if target == "/":
                     response = f"{HTTP_200}\r\n".encode()
                 elif target.startswith("/echo/"):
+                    encoding = headers.get("Accept-Encoding").lower()
                     value = target.split("/echo/", 1)[1]
-                    response = (
-                        f"{HTTP_200}"
-                        f"Content-Type: text/plain\r\n"
-                        f"Content-Length: {len(value)}\r\n\r\n"
-                        f"{value}"
-                    ).encode()
+                    if(encoding in VALID_ENCODINGS):
+                        response = (
+                            f"{HTTP_200}"
+                            f"Content-Type: text/plain\r\n"
+                            f"Content-Encoding: gzip\r\n\r\n"
+                            f"{value}"
+                        ).encode()
+                    else:
+                        response = (
+                            f"{HTTP_200}"
+                            f"Content-Type: text/plain\r\n\r\n"
+                            f"{value}"
+                        ).encode()
                 elif target == "/user-agent":
                     user_agent = headers.get("User-Agent", "Unknown")
                     response = (
@@ -64,7 +74,6 @@ def handle_client(conn, addr, folder: Path = None):
                     if folder is None:
                         response = NOT_FOUND_RESPONSE
                     else:
-                        # Sanitize the file name to avoid directory traversal issues
                         file_name = Path(target[len("/files/"):]).name
                         abs_path = folder / file_name
                         file_contents = retrieve_file_contents(abs_path)
@@ -79,9 +88,13 @@ def handle_client(conn, addr, folder: Path = None):
                 elif target.startswith("/files/") and method == "POST":
                     file_name = Path(target[len("/files/"):]).name
                     abs_path = folder / file_name
-                    with open(abs_path, 'w') as f:
-                        f.write(body)
-                    response = f"{HTTP_201_CREATED}".encode()
+                    try:
+                        with open(abs_path, 'w') as f:
+                            f.write(body)
+                        response = f"{HTTP_201_CREATED}".encode()
+                    except IOError:
+                        conn.sendall(NOT_FOUND_RESPONSE)
+                        break
                 else:
                     response = NOT_FOUND_RESPONSE
 
