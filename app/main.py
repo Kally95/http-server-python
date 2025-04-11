@@ -53,13 +53,15 @@ def handle_client(conn, addr, folder: Path = None):
                         response = (
                             f"{HTTP_200}"
                             f"Content-Type: text/plain\r\n"
+                            f"Content-Length: {len(user_agent)}\r\n"
                             f"Content-Encoding: gzip\r\n\r\n"
                             f"{value}"
                         ).encode()
                     else:
                         response = (
                             f"{HTTP_200}"
-                            f"Content-Type: text/plain\r\n\r\n"
+                            f"Content-Type: text/plain\r\n"
+                            f"Content-Length: {len(user_agent)}\r\n\r\n"
                             f"{value}"
                         ).encode()
                 elif target == "/user-agent":
