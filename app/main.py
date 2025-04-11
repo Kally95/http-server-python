@@ -2,6 +2,7 @@ import socket
 import threading
 import sys
 from pathlib import Path
+import gzip
 
 HTTP_200 = "HTTP/1.1 200 OK\r\n"
 HTTP_404 = "HTTP/1.1 404 Not Found\r\n\r\n"
@@ -51,10 +52,11 @@ def handle_client(conn, addr, folder: Path = None):
                     if(encoding is not None):
                         encoding_exists = [val for val in encoding.split(', ') if val in VALID_ENCODINGS]
                         if(encoding_exists):
+                            s_out = gzip.compress(b"value")
                             response = (
                                 f"{HTTP_200}"
                                 f"Content-Type: text/plain\r\n"
-                                f"Content-Length: {len(value)}\r\n"
+                                f"Content-Length: {len(s_out)}\r\n"
                                 f"Content-Encoding: gzip\r\n\r\n"
                                 f"{value}"
                             ).encode()
