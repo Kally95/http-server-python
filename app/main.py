@@ -53,19 +53,19 @@ def handle_client(conn, addr, folder: Path = None):
                         encoding_exists = [val for val in encoding.split(', ') if val in VALID_ENCODINGS]
                         if(encoding_exists):
                             compressed_body = gzip.compress(value.encode("utf-8"))
-                            response = (
+                            header = (
                                 f"{HTTP_200}"
                                 f"Content-Type: text/plain\r\n"
                                 f"Content-Length: {str(len(compressed_body))}\r\n"
                                 f"Content-Encoding: gzip\r\n\r\n"
-                                f"{compressed_body}"
                             ).encode()
+                            response = header + compressed_body
                         else:
                             response = (
                                 f"{HTTP_200}"
                                 f"Content-Type: text/plain\r\n"
-                                f"Content-Length: {str(len(compressed_body))}\r\n\r\n"
-                                f"{compressed_body}"
+                                f"Content-Length: {str(len(value))}\r\n\r\n"
+                                f"{value}"
                             ).encode()
                     else:
                         response = (
